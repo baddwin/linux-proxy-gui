@@ -7,11 +7,17 @@ Dialog::Dialog(QWidget *parent) :
     ui(new Ui::Dialog)
 {
     ui->setupUi(this);
-    proxconf = (QDir::homePath()+"/.proxychains/proxychains.conf");
-
+    QString proxdir = QDir::homePath()+"/.proxychains";
+    proxconf = (proxdir+"/proxychains.conf");
+    QDir confD(proxdir);
     QFile confF(proxconf);
     if(!confF.exists())
     {
+        ui->labelStatus->setText("Klik simpan");
+        if(!confD.exists()) {
+            //qDebug() << "folder config tidak ada";
+            confD.mkdir(proxdir);
+        }
         confF.open(QIODevice::WriteOnly);
         QTextStream tulis(&confF);
         tulis.operator <<("# Created by Editsox on "+QDate::currentDate().toString("dddd, dd MMMM yyyy")+"\n\n");
@@ -26,6 +32,7 @@ Dialog::Dialog(QWidget *parent) :
     }
     else
     {
+        ui->labelStatus->setText("Siap diedit");
         ui->spinBox->setValue(bacaFile(0).toInt());
         confF.close();
     }
